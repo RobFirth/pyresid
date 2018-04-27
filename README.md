@@ -1,8 +1,6 @@
-# PDB-protein-res
------
-## pyresid
+# pyresid
 
-python (protein structure) residual ID
+A python (protein structure) residue annotator. A West-Life project.
 
 You need to install the english models for `spaCy` with:
 
