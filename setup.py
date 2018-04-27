@@ -53,5 +53,5 @@ setup(# package information
       packages=[packageName,],
       package_dir={packageName: packageName},
       package_data={packageName:['mmCIF/*', "PDB/*"]},
-      install_requires=["bs4"]#,
+      install_requires=["bs4", "spacy"]#,
     )
