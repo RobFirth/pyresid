@@ -1,0 +1,44 @@
+\begin{sphinxtheindex}
+\def\bigletter#1{{\Large\sffamily#1}\nopagebreak\vspace{1mm}}
+
+  \bigletter C
+  \item check\_residue\_candidate\_validity() (in module pyresid), \hyperpage{5}
+
+  \indexspace
+  \bigletter G
+  \item get\_sections\_text() (in module pyresid), \hyperpage{11}
+  \item get\_text() (in module pyresid), \hyperpage{12}
+
+  \indexspace
+  \bigletter I
+  \item identify\_protein\_ID() (in module pyresid), \hyperpage{5}
+  \item identify\_residues() (in module pyresid), \hyperpage{3}
+
+  \indexspace
+  \bigletter L
+  \item load\_protein\_IDs() (in module pyresid), \hyperpage{12}
+  \item locate\_proteins() (in module pyresid), \hyperpage{7}
+  \item locate\_residues() (in module pyresid), \hyperpage{3}
+
+  \indexspace
+  \bigletter M
+  \item MatchClass (class in pyresid), \hyperpage{15}
+  \item MyEncoder (class in pyresid), \hyperpage{15}
+
+  \indexspace
+  \bigletter P
+  \item parse\_request() (in module pyresid), \hyperpage{9}
+  \item process() (in module pyresid), \hyperpage{3}
+  \item ProteinMatchClass (class in pyresid), \hyperpage{15}
+
+  \indexspace
+  \bigletter R
+  \item reconstruct\_fulltext() (in module pyresid), \hyperpage{11, 12}
+  \item request\_fulltextXML() (in module pyresid), \hyperpage{9}
+
+  \indexspace
+  \bigletter S
+  \item setup\_plot\_defaults() (in module pyresid), \hyperpage{13}
+  \item SourceClass (class in pyresid), \hyperpage{15}
+
+\end{sphinxtheindex}

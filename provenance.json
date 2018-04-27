@@ -1,0 +1,17 @@
+{
+  "@context": {
+    "dc": "http://purl.org/dc/elements/1.1/",
+    "provenance": "https://hartree.stfc.ac.uk/West-Life-annotator",
+    "rdf": "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#"
+  },
+  "@id": " https://hartree.stfc.ac.uk/West-Life-annotator_2018-03-01",
+  "@type": "http://edamontology.org/operation_3778",
+  "dc:author": "Rob Firth",
+  "dc:description": "Identify sentences in structural publications that refer to local features of a protein",
+  "dc:publisher": {
+    "@id": "https://hartree.stfc.ac.uk/"
+  },
+  "dc:title": "West-Life Protein Residue Annotator"
+}
