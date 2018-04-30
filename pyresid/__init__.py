@@ -7,25 +7,25 @@ Python tools for mining Protein Residues from Fulltext articles using PMC number
 author: robert.firth@stfc.ac.uk
 """
 
-import re
-import os
-import requests
-import json
-import warnings
-import gzip
-import shutil
-
-import spacy as spacy
-import numpy as np
-import CifFile as CifFile
-from fuzzywuzzy import process as fwprocess
-from collections import OrderedDict
-from matplotlib import pyplot as plt
-from bs4 import BeautifulSoup
-from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
-from Bio.PDB import MMCIFParser
-from pandas import DataFrame, read_table
-from ftplib import FTP
+# import re
+# import os
+# import requests
+# import json
+# import warnings
+# import gzip
+# import shutil
+#
+# import spacy as spacy
+# import numpy as np
+# import CifFile as CifFile
+# from fuzzywuzzy import process as fwprocess
+# from collections import OrderedDict
+# from matplotlib import pyplot as plt
+# from bs4 import BeautifulSoup
+# from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+# from Bio.PDB import MMCIFParser
+# from pandas import DataFrame, read_table
+# from ftplib import FTP
 
 __author__ = "Rob Firth"
 __version__ = "0.5"
