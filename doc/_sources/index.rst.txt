@@ -3,13 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. .. image:: ./_static/images/west-life.png
+.. .. image:: ./static/images/west-life.png
    :height: 100px
    :align: left
-.. .. image:: ./_static/images/Hartree_Centre_Logo.jpg
+.. .. image:: ./static/images/Hartree_Centre_Logo.jpg
    :height: 100px
    :align: right
-.. image:: _static/images/CombinedLogo.png
+.. image:: ./static/images/CombinedLogo.png
    :height: 100px
    :align: center
 
@@ -40,5 +40,5 @@ Indices and tables
 Structure
 =========
 
-.. image:: ./_static/images/pyresid_flow_report_full_big.png
+.. image:: ./static/images/pyresid_flow_report_full_big.png
    :align: center
