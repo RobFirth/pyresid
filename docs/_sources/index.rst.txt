@@ -9,7 +9,7 @@
 .. .. image:: ./_static/images/Hartree_Centre_Logo.jpg
    :height: 100px
    :align: right
-.. image:: ./_static/images/CombinedLogo.png
+.. image:: _static/images/CombinedLogo.png
    :height: 100px
    :align: center
 
