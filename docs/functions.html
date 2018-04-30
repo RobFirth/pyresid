@@ -1,0 +1,621 @@
+
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="X-UA-Compatible" content="IE=Edge" />
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    <title>High-Level Functions &#8212; pyresid 0.5 documentation</title>
+    <link rel="stylesheet" href="_static/alabaster.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <script type="text/javascript" src="_static/documentation_options.js"></script>
+    <script type="text/javascript" src="_static/jquery.js"></script>
+    <script type="text/javascript" src="_static/underscore.js"></script>
+    <script type="text/javascript" src="_static/doctools.js"></script>
+    <link rel="shortcut icon" href="_static/docs_favicon.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Classes" href="classes.html" />
+    <link rel="prev" title="Welcome to the docs for pyresid" href="index.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+  
+  <meta name="viewport" content="width=device-width, initial-scale=0.9, maximum-scale=0.9" />
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="high-level-functions">
+<h1>High-Level Functions<a class="headerlink" href="#high-level-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pyresid.identify_residues">
+<code class="descclassname">pyresid.</code><code class="descname">identify_residues</code><span class="sig-paren">(</span><em>fulltext</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.identify_residues" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Regular Expressions to identify and locate usages of residues within the supplied <cite>fulltext</cite>. Returns a
+list of MatchClass objects that contain the start and end of the match within the text, and the matched string.
+For compound matches, a list of positions and residues is included in the match, which needs decomposing before
+further use.
+Based on Ravikumar+ 2012.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fulltext</strong> (<em>string</em>) – text to be searched for residues.</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>matches</strong> – The matches found within <cite>fulltext</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List of <a class="reference internal" href="classes.html#pyresid.MatchClass" title="pyresid.MatchClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">MatchClass</span></code></a> objects</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#pyresid.locate_residues" title="pyresid.locate_residues"><code class="xref py py-func docutils literal notranslate"><span class="pre">locate_residues()</span></code></a></li>
+<li><a class="reference internal" href="#pyresid.process" title="pyresid.process"><code class="xref py py-func docutils literal notranslate"><span class="pre">process()</span></code></a></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.locate_residues">
+<code class="descclassname">pyresid.</code><code class="descname">locate_residues</code><span class="sig-paren">(</span><em>source</em>, <em>matches</em>, <em>decompose=True</em>, <em>nlp=None</em>, <em>cifscantype='flex'</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.locate_residues" title="Permalink to this definition">¶</a></dt>
+<dd><p>This function takes the raw list of matches from <a class="reference internal" href="#pyresid.identify_residues" title="pyresid.identify_residues"><code class="xref py py-func docutils literal notranslate"><span class="pre">identify_residues()</span></code></a> and augments them
+with contextual information and matches them against protein matches also found within the text.</p>
+<p>This is a reincarnation of locate_residues2 (despite the name).</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>source</strong> (<a class="reference internal" href="classes.html#pyresid.SourceClass" title="pyresid.SourceClass"><code class="xref py py-func docutils literal notranslate"><span class="pre">SourceClass()</span></code></a>) – Class instance containing the source id and fulltext (and possibly the <cite>spaCy</cite> doc)</li>
+<li><strong>matches</strong> (<em>List</em>) – a list of <a class="reference internal" href="classes.html#pyresid.MatchClass" title="pyresid.MatchClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">MatchClass</span></code></a> objects</li>
+<li><strong>decompose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: True.</em>) – Whether to turn the “compound” mentions matched into actual residues.</li>
+<li><strong>nlp</strong> (spaCy model - <a class="reference external" href="https://spacy.io/usage/models">https://spacy.io/usage/models</a>, optional, default: None) – The text model to use to turn the <cite>source.fulltext</cite> into <cite>source.doc</cite></li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>matches</strong> – The matches found within <cite>fulltext</cite>, augmented with contextual information - sentence, prefix
+postfix, protein accession id.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List of <a class="reference internal" href="classes.html#pyresid.MatchClass" title="pyresid.MatchClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">MatchClass</span></code></a> objects</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.process">
+<code class="descclassname">pyresid.</code><code class="descname">process</code><span class="sig-paren">(</span><em>ext_id_list</em>, <em>outdir</em>, <em>filename='pyresid_output.json'</em>, <em>provider='West-Life'</em>, <em>cifscantype='flex'</em>, <em>save=True</em>, <em>overwrite=False</em>, <em>return_dict=False</em>, <em>decompose=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.process" title="Permalink to this definition">¶</a></dt>
+<dd><p>This wraps the main workhorse functions, taking a list of PMC IDs and mining the resulting fulltext.
+output is a json structure (the encoded output of _locate_residues saved with MyEncoder), to match
+the EBI specifications.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ext_id_list</strong> (<em>List of strings</em>) – List containing ePMC identifiers used to retrieve the relevant entry. Format is prefix of ‘PMC’
+followed by an integer.</li>
+<li><strong>outdir</strong> (<em>String</em><em> or </em><em>Path</em>) – Directory that will contain the output file.</li>
+<li><strong>filename</strong> (<em>String</em>) – The structured output JSON file containing the annotations, one line per <cite>ext_id</cite>.</li>
+<li><strong>save</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: True</em>) – Flag to turn off writing the  JSON. Good for debugging whenm combined with <cite>return_dict</cite>.</li>
+<li><strong>overwrite</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to determine whether to append (default) or overwrite the json file</li>
+<li><strong>return_dict</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to return the output as a dictionary</li>
+<li><strong>cifscantype</strong> (<em>{&quot;flex&quot;</em><em>, </em><em>&quot;standard&quot;}</em><em>, </em><em>default: &quot;flex&quot;</em>) – Flag passed to <cite>pycifrw</cite> via <code class="xref py py-func docutils literal notranslate"><span class="pre">_locate_residues2()</span></code>; <cite>scantype</cite> can be <cite>standard</cite> or <cite>flex</cite>.  <cite>standard</cite> provides
+pure Python parsing at the cost of a factor of 10 or so in speed.  <cite>flex</cite> will tokenise
+the input CIF file using fast C routines.  Note that running PyCIFRW in Jython uses
+native Java regular expressions to provide a speedup regardless of this argument.</li>
+<li><strong>context</strong> (<em>String</em><em>, </em><em>optional</em><em>, </em><em>default: &quot;sent&quot;</em>) – Flag passed to <code class="xref py py-func docutils literal notranslate"><span class="pre">_locate_residues2()</span></code> to determine the type of context added
+to annotations, “sent” uses the spaCy parsed sentences, anything else will use <cite>x</cite>
+characters either side of the matched tokens.</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>(optional) outdict</strong> – Dictionary containing the annotations. Good for debugging.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">OrderedDict</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#pyresid.locate_residues" title="pyresid.locate_residues"><code class="xref py py-func docutils literal notranslate"><span class="pre">locate_residues()</span></code></a></li>
+</ul>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="candidate-identification-functions">
+<h1>Candidate Identification Functions<a class="headerlink" href="#candidate-identification-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pyresid.identify_protein_ID">
+<code class="descclassname">pyresid.</code><code class="descname">identify_protein_ID</code><span class="sig-paren">(</span><em>fulltext</em>, <em>simple=False</em>, <em>infile=None</em>, <em>locdir=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.identify_protein_ID" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Regular Expressions to find Protein IDs in the, and then cross-checks against the PDB list
+of entities.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fulltext</strong> (<em>string</em>) – text snippet to be searched for residues.</li>
+<li><strong>simple</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag that, if set, will skip the check against the PDB. Generally a bad idea.</li>
+<li><strong>infile</strong> (<em>String</em><em> or </em><em>Path</em><em>, </em><em>optional</em><em>, </em><em>None</em>) – File to load in order to check candidate PDB entries against. contains the PDB entries -
+if <cite>None</cite> defaults to “PDBID.list”</li>
+<li><strong>locdir</strong> (<em>String</em><em> or </em><em>Path</em><em>, </em><em>optional</em><em>, </em><em>default: None</em>) – Directory that contains the infile. If None, default is assumed to be <cite>PDB_dir</cite>, if this
+is not found then will be the user home.</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>unique_protiens</strong> – Matches found within <cite>fulltext</cite></p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">Set</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><code class="xref py py-func docutils literal notranslate"><span class="pre">_identify_residues()</span></code>
+<a class="reference internal" href="#pyresid.load_protein_IDs" title="pyresid.load_protein_IDs"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_protein_IDs()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.check_residue_candidate_validity">
+<code class="descclassname">pyresid.</code><code class="descname">check_residue_candidate_validity</code><span class="sig-paren">(</span><em>cand</em>, <em>pattern='[a-zA-Z]{3}\\d+/\\d+|[a-zA-Z]{3}\\d+'</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.check_residue_candidate_validity" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>cand</strong> (<em>String</em>) – Candidate residue to check for validity</li>
+<li><strong>pattern</strong> (<em>String</em><em>, </em><em>optional</em><em>, </em><em>default : &quot;</em><em>[</em><em>a-zA-Z</em><em>]</em><em>{3}d+/d+|</em><em>[</em><em>a-zA-Z</em><em>]</em><em>{3}d+&quot;.</em>) – Regular Expression with which to match the candidate.</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>match_bool_list</strong> – List of True/False booleans reflecting the validity of the input candidates.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List of Bool.</p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="location-functions">
+<h1>Location Functions<a class="headerlink" href="#location-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pyresid.locate_proteins">
+<code class="descclassname">pyresid.</code><code class="descname">locate_proteins</code><span class="sig-paren">(</span><em>fulltext</em>, <em>simple=False</em>, <em>infile=None</em>, <em>locdir=None</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.locate_proteins" title="Permalink to this definition">¶</a></dt>
+<dd><p>Uses Regular Expressions to find Protein IDs in the, and then cross-checks against the PDB list
+of entities. Returns a list of MatchClass objects, rather than a list of strings, as in</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fulltext</strong> (<em>string</em>) – text snippet to be searched for residues.</li>
+<li><strong>simple</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag that, if set, will skip the check against the PDB. Generally a bad idea.</li>
+<li><strong>infile</strong> (<em>String</em><em> or </em><em>Path</em><em>, </em><em>optional</em><em>, </em><em>None</em>) – File to load in order to check candidate PDB entries against. contains the PDB entries -
+if <cite>None</cite> defaults to “PDBID.list”</li>
+<li><strong>locdir</strong> (<em>String</em><em> or </em><em>Path</em><em>, </em><em>optional</em><em>, </em><em>default: None</em>) – Directory that contains the infile. If None, default is assumed to be <cite>PDB_dir</cite>, if this
+is not found then will be the user home.</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>matches</strong> – The matches found within <cite>fulltext</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List of <a class="reference internal" href="classes.html#pyresid.MatchClass" title="pyresid.MatchClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">MatchClass</span></code></a> objects</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#pyresid.identify_residues" title="pyresid.identify_residues"><code class="xref py py-func docutils literal notranslate"><span class="pre">identify_residues()</span></code></a></li>
+<li><a class="reference internal" href="#pyresid.load_protein_IDs" title="pyresid.load_protein_IDs"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_protein_IDs()</span></code></a></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descclassname">pyresid.</code><code class="descname">locate_proteins</code><span class="sig-paren">(</span><em>fulltext</em>, <em>simple=False</em>, <em>infile=None</em>, <em>locdir=None</em>, <em>verbose=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Uses Regular Expressions to find Protein IDs in the, and then cross-checks against the PDB list
+of entities. Returns a list of MatchClass objects, rather than a list of strings, as in</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>fulltext</strong> (<em>string</em>) – text snippet to be searched for residues.</li>
+<li><strong>simple</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag that, if set, will skip the check against the PDB. Generally a bad idea.</li>
+<li><strong>infile</strong> (<em>String</em><em> or </em><em>Path</em><em>, </em><em>optional</em><em>, </em><em>None</em>) – File to load in order to check candidate PDB entries against. contains the PDB entries -
+if <cite>None</cite> defaults to “PDBID.list”</li>
+<li><strong>locdir</strong> (<em>String</em><em> or </em><em>Path</em><em>, </em><em>optional</em><em>, </em><em>default: None</em>) – Directory that contains the infile. If None, default is assumed to be <cite>PDB_dir</cite>, if this
+is not found then will be the user home.</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>matches</strong> – The matches found within <cite>fulltext</cite>.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List of <a class="reference internal" href="classes.html#pyresid.MatchClass" title="pyresid.MatchClass"><code class="xref py py-class docutils literal notranslate"><span class="pre">MatchClass</span></code></a> objects</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#pyresid.identify_residues" title="pyresid.identify_residues"><code class="xref py py-func docutils literal notranslate"><span class="pre">identify_residues()</span></code></a></li>
+<li><a class="reference internal" href="#pyresid.load_protein_IDs" title="pyresid.load_protein_IDs"><code class="xref py py-func docutils literal notranslate"><span class="pre">load_protein_IDs()</span></code></a></li>
+</ul>
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="api-iteraction-functions">
+<h1>API Iteraction Functions<a class="headerlink" href="#api-iteraction-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pyresid.request_fulltextXML">
+<code class="descclassname">pyresid.</code><code class="descname">request_fulltextXML</code><span class="sig-paren">(</span><em>ext_id</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.request_fulltextXML" title="Permalink to this definition">¶</a></dt>
+<dd><p>Requests a fulltext XML document from the ePMC REST API. Raises a warning if this is not
+possible</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ext_id</strong> (<em>String</em>) – ePMC identifier used to retrieve the relevant entry. Format is prefix of ‘PMC’
+followed by an integer.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>r</strong> – The response to the query served up by the requests package.</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="http://docs.python-requests.org/en/master/api/#requests.Response">Requests.Response</a></td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.parse_request">
+<code class="descclassname">pyresid.</code><code class="descname">parse_request</code><span class="sig-paren">(</span><em>ext_id</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.parse_request" title="Permalink to this definition">¶</a></dt>
+<dd><p>Wrapper for <a class="reference internal" href="#pyresid.request_fulltextXML" title="pyresid.request_fulltextXML"><code class="xref py py-func docutils literal notranslate"><span class="pre">request_fulltextXML()</span></code></a> that returns a <cite>BeautifulSoup</cite> XML object</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><strong>ext_id</strong> (<em>String</em>) – ePMC identifier used to retrieve the relevant entry. Format is prefix of ‘PMC’
+followed by an integer.</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><strong>soup</strong> – BeautifulSoup XML object created from the text response from  <a class="reference internal" href="#pyresid.request_fulltextXML" title="pyresid.request_fulltextXML"><code class="xref py py-func docutils literal notranslate"><span class="pre">pyresid.request_fulltextXML()</span></code></a></td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><a class="reference external" href="https://www.crummy.com/software/BeautifulSoup/bs4/doc/index.html#beautifulsoup">BeautifulSoup</a></td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyresid.request_fulltextXML" title="pyresid.request_fulltextXML"><code class="xref py py-func docutils literal notranslate"><span class="pre">request_fulltextXML()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.download_pdbfile">
+<code class="descclassname">pyresid.</code><code class="descname">download_pdbfile</code><span class="sig-paren">(</span><em>pdb_id</em>, <em>outfile=None</em>, <em>overwrite=True</em>, <em>verbose=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.download_pdbfile" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first last simple">
+<li><strong>pdb_id</strong> – </li>
+<li><strong>outfile</strong> – </li>
+<li><strong>overwrite</strong> – </li>
+<li><strong>verbose</strong> – </li>
+</ul>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.download_pdbfile_RCSB">
+<code class="descclassname">pyresid.</code><code class="descname">download_pdbfile_RCSB</code><span class="sig-paren">(</span><em>pdb_id</em>, <em>outfile=None</em>, <em>overwrite=True</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.download_pdbfile_RCSB" title="Permalink to this definition">¶</a></dt>
+<dd><table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>pdb_id</strong> – </li>
+<li><strong>outfile</strong> – </li>
+<li><strong>overwrite</strong> – </li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"></p>
+</td>
+</tr>
+</tbody>
+</table>
+</dd></dl>
+
+</div>
+<div class="section" id="other-functions">
+<h1>Other Functions<a class="headerlink" href="#other-functions" title="Permalink to this headline">¶</a></h1>
+<dl class="function">
+<dt id="pyresid.get_sections_text">
+<code class="descclassname">pyresid.</code><code class="descname">get_sections_text</code><span class="sig-paren">(</span><em>ext_id</em>, <em>remove_tables=True</em>, <em>fulltext=False</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.get_sections_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>Requests fulltext XML from the EBI ePMC web REST API, parses the response into a dict.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ext_id</strong> (<em>String</em>) – ePMC identifier used to retrieve the relevant entry. Format is prefix of ‘PMC’
+followed by an integer.</li>
+<li><strong>remove_tables</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: True</em>) – Flag to ignore the text found within tables.</li>
+<li><strong>fulltext</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag used to return a ‘dumb’ fulltext (rather than that
+from <a class="reference internal" href="#pyresid.reconstruct_fulltext" title="pyresid.reconstruct_fulltext"><code class="xref py py-func docutils literal notranslate"><span class="pre">reconstruct_fulltext()</span></code></a>)</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>text_dict</strong> – Dictionary containing the parsed XML. Each entry corresponds to a Section
+in the XML (technically a child of the <cite>&lt;body&gt;</cite>).</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">OrderedDict</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#pyresid.request_fulltextXML" title="pyresid.request_fulltextXML"><code class="xref py py-func docutils literal notranslate"><span class="pre">request_fulltextXML()</span></code></a></li>
+<li><a class="reference internal" href="#pyresid.parse_request" title="pyresid.parse_request"><code class="xref py py-func docutils literal notranslate"><span class="pre">parse_request()</span></code></a></li>
+<li><a class="reference internal" href="#pyresid.reconstruct_fulltext" title="pyresid.reconstruct_fulltext"><code class="xref py py-func docutils literal notranslate"><span class="pre">reconstruct_fulltext()</span></code></a></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.reconstruct_fulltext">
+<code class="descclassname">pyresid.</code><code class="descname">reconstruct_fulltext</code><span class="sig-paren">(</span><em>text_dict</em>, <em>tokenise=True</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.reconstruct_fulltext" title="Permalink to this definition">¶</a></dt>
+<dd><p>Converts a <em>text_dict</em> into a single string or series of tokens in a list of strings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>text_dict</strong> (<em>Dict</em><em> or </em><em>OrderedDict</em>) – Dictionary containing the parsed XML. Each entry corresponds to a Section
+in the XML. Usually an output from <a class="reference internal" href="#pyresid.get_sections_text" title="pyresid.get_sections_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_sections_text()</span></code></a></li>
+<li><strong>tokenise</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to enable or disable the reconstructed text being returned as spaCy tokens
+rather than a string</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fulltext</strong> (<em>string</em>) – text snippet to be searched for residues.</li>
+<li><em>OR</em></li>
+<li><strong>fulltext_tokens</strong> (<em>List of strings</em>) – Array of tokens that can be used, for example, to search for
+<em>residue_mentions</em>.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyresid.get_sections_text" title="pyresid.get_sections_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_sections_text()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.load_protein_IDs">
+<code class="descclassname">pyresid.</code><code class="descname">load_protein_IDs</code><span class="sig-paren">(</span><em>infile=None</em>, <em>locdir=None</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.load_protein_IDs" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reads in list of valid (approved and pending) PDB entries.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>infile</strong> (<em>String</em><em> or </em><em>Path</em><em>, </em><em>optional</em><em>, </em><em>default: None</em>) – File that contains the PDB entries - defaults to “PDBID.list”</li>
+<li><strong>locdir</strong> (<em>String</em><em> or </em><em>Path</em><em>, </em><em>optional</em><em>, </em><em>default: None</em>) – Directory that contains the infile. If None, default is assumed to be <cite>PDB_dir</cite>, if this
+is not found then will be the user home.</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>pdb_arr</strong> – List of valid (approved and pending) PDB entries</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">List of strings</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><code class="xref py py-func docutils literal notranslate"><span class="pre">pyresid.combine_compound_IDs()</span></code></li>
+<li><code class="xref py py-func docutils literal notranslate"><span class="pre">pyresid.get_compound_IDfiles()</span></code></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt>
+<code class="descclassname">pyresid.</code><code class="descname">reconstruct_fulltext</code><span class="sig-paren">(</span><em>text_dict</em>, <em>tokenise=True</em>, <em>verbose=False</em><span class="sig-paren">)</span></dt>
+<dd><p>Converts a <em>text_dict</em> into a single string or series of tokens in a list of strings.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>text_dict</strong> (<em>Dict</em><em> or </em><em>OrderedDict</em>) – Dictionary containing the parsed XML. Each entry corresponds to a Section
+in the XML. Usually an output from <a class="reference internal" href="#pyresid.get_sections_text" title="pyresid.get_sections_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_sections_text()</span></code></a></li>
+<li><strong>tokenise</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to enable or disable the reconstructed text being returned as spaCy tokens
+rather than a string</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first last"><ul class="simple">
+<li><strong>fulltext</strong> (<em>string</em>) – text snippet to be searched for residues.</li>
+<li><em>OR</em></li>
+<li><strong>fulltext_tokens</strong> (<em>List of strings</em>) – Array of tokens that can be used, for example, to search for
+<em>residue_mentions</em>.</li>
+</ul>
+</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<p class="last"><a class="reference internal" href="#pyresid.get_sections_text" title="pyresid.get_sections_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_sections_text()</span></code></a></p>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.get_text">
+<code class="descclassname">pyresid.</code><code class="descname">get_text</code><span class="sig-paren">(</span><em>ext_id</em>, <em>verbose=False</em><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.get_text" title="Permalink to this definition">¶</a></dt>
+<dd><p>A wrapper for <a class="reference internal" href="#pyresid.get_sections_text" title="pyresid.get_sections_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_sections_text()</span></code></a> that adds additional information
+to the <em>text_dict</em>.</p>
+<table class="docutils field-list" frame="void" rules="none">
+<col class="field-name" />
+<col class="field-body" />
+<tbody valign="top">
+<tr class="field-odd field"><th class="field-name">Parameters:</th><td class="field-body"><ul class="first simple">
+<li><strong>ext_id</strong> (<em>String</em>) – ePMC identifier used to retrieve the relevant entry. Format is prefix of ‘PMC’
+followed by an integer.</li>
+<li><strong>verbose</strong> (<em>Bool</em><em>, </em><em>optional</em><em>, </em><em>default: False</em>) – Flag to turn on verbose output</li>
+</ul>
+</td>
+</tr>
+<tr class="field-even field"><th class="field-name">Returns:</th><td class="field-body"><p class="first"><strong>text_dict</strong> – Dictionary containing the parsed XML. Each entry corresponds to a Section
+in the XML (technically a child of the <cite>&lt;body&gt;</cite>). An augmented version of
+the <em>text_dict</em> returned by <a class="reference internal" href="#pyresid.get_sections_text" title="pyresid.get_sections_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_sections_text()</span></code></a> - containing
+additional information including spaCy tokens, length in characters and
+starting offset.</p>
+</td>
+</tr>
+<tr class="field-odd field"><th class="field-name">Return type:</th><td class="field-body"><p class="first last">OrderedDict</p>
+</td>
+</tr>
+</tbody>
+</table>
+<div class="admonition seealso">
+<p class="first admonition-title">See also</p>
+<ul class="last simple">
+<li><a class="reference internal" href="#pyresid.get_sections_text" title="pyresid.get_sections_text"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_sections_text()</span></code></a></li>
+</ul>
+</div>
+</dd></dl>
+
+<dl class="function">
+<dt id="pyresid.setup_plot_defaults">
+<code class="descclassname">pyresid.</code><code class="descname">setup_plot_defaults</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#pyresid.setup_plot_defaults" title="Permalink to this definition">¶</a></dt>
+<dd><p>Sets up default plot settings for figures.</p>
+</dd></dl>
+
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/pyresid_logo_whitebackground.png" alt="Logo"/>
+            </a></p>
+  <h3><a href="index.html">Table Of Contents</a></h3>
+  <ul>
+<li><a class="reference internal" href="#">High-Level Functions</a></li>
+<li><a class="reference internal" href="#candidate-identification-functions">Candidate Identification Functions</a></li>
+<li><a class="reference internal" href="#location-functions">Location Functions</a></li>
+<li><a class="reference internal" href="#api-iteraction-functions">API Iteraction Functions</a></li>
+<li><a class="reference internal" href="#other-functions">Other Functions</a></li>
+</ul>
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="index.html" title="previous chapter">Welcome to the docs for <cite>pyresid</cite></a></li>
+      <li>Next: <a href="classes.html" title="next chapter">Classes</a></li>
+  </ul></li>
+</ul>
+</div>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="_sources/functions.rst.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    </div>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &copy;2018, Rob Firth.
+      
+      |
+      Powered by <a href="http://sphinx-doc.org/">Sphinx 1.7.1</a>
+      &amp; <a href="https://github.com/bitprophet/alabaster">Alabaster 0.7.10</a>
+      
+      |
+      <a href="_sources/functions.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
