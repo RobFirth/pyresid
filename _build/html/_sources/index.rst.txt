@@ -41,5 +41,4 @@ Structure
 =========
 
 .. image:: ./_static/images/pyresid_flow_report_full_big.png
-   :width:
    :align: center

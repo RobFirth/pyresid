@@ -34,7 +34,10 @@ API Iteraction Functions
 
 .. autofunction:: pyresid.parse_request
 
-.. autofunction:: pyresid.download_pdbfile_PDBe
+.. autofunction:: pyresid.download_pdbfile
+
+.. autofunction:: pyresid.download_pdbfile_RCSB
+
 
 Other Functions
 ===============
