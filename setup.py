@@ -53,5 +53,6 @@ setup(# package information
       packages=[packageName,],
       package_dir={packageName: packageName},
       package_data={packageName:['mmCIF/*', "PDB/*"]},
-      install_requires=["bs4", "spacy"]#,
+      install_requires=["bs4", "scipy", "numpy", "matplotlib", "spacy", "lxml", "biopython", "pycifrw",
+                        "fuzzywuzzy", "python-Levenshtein"]#,
     )

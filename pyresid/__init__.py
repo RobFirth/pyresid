@@ -7,13 +7,13 @@ Python tools for mining Protein Residues from Fulltext articles using PMC number
 author: robert.firth@stfc.ac.uk
 """
 
-# import re
-# import os
-# import requests
-# import json
-# import warnings
-# import gzip
-# import shutil
+import re
+import os
+import requests
+import json
+import warnings
+import gzip
+import shutil
 #
 # import spacy as spacy
 # import numpy as np
