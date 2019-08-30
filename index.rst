@@ -3,13 +3,13 @@
    You can adapt this file completely to your liking, but it should at least
    contain the root `toctree` directive.
 
-.. .. image:: ./static/images/west-life.png
+.. .. image:: ./_static/images/west-life.png
    :height: 100px
    :align: left
-.. .. image:: ./static/images/Hartree_Centre_Logo.jpg
+.. .. image:: ./_static/images/Hartree_Centre_Logo.jpg
    :height: 100px
    :align: right
-.. image:: ./static/images/CombinedLogo.png
+.. image:: ./_static/images/CombinedLogo.png
    :height: 100px
    :align: center
 
@@ -18,6 +18,8 @@ Welcome to the docs for `pyresid`
 
 Python tools for mining Protein Residues from Fulltext articles using PMC number, ePMC and PDB.
 Identify sentences in structural publications that refer to local features of a protein.
+
+Note: run `pyresid.check_PDB_IDfiles` the first time you import `pyresid` - this builds the local valid and pending PDB registry.
 
 .. toctree::
    :maxdepth: 2
@@ -40,5 +42,6 @@ Indices and tables
 Structure
 =========
 
-.. image:: ./static/images/pyresid_flow_report_full_big.png
+.. image:: ./_static/images/pyresid_flow_report_full_big.png
+   :width:
    :align: center

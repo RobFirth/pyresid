@@ -7,11 +7,19 @@ import os
 import unittest
 import json
 import io
+import pickle
 import pyresid as pyre
 
 from collections import OrderedDict
 import spacy
-nlp = spacy.load('en')
+
+try:
+    # nlp = spacy.load('en')
+    nlp = spacy.load("en_core_web_lg")
+
+except IOError:
+
+    nlp = spacy.load('en_core_web_md')
 
 if __name__ == "__main__":
     this_dir = os.path.abspath(os.path.join(__file__, os.pardir))
@@ -36,6 +44,7 @@ def deep_sort(obj):
         _sorted = sorted(new_list)
 
     else:
+
         _sorted = obj
 
     return _sorted
@@ -107,9 +116,11 @@ class TestClass(unittest.TestCase):
         "it is really long and it is at the start of the string.")
 
     def test_identify_residues_on_slashed_testsent(self):
-        matches = pyre.identify_residues_ravikumar(self.slashed_res_sent)
+        matches = pyre.identify_residues(self.slashed_res_sent)
 
         test_set = [match.__dict__ for match in matches]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in matches]
+
         truth = [{'aminoacid': 'Tyrosine',
                   'end': 103,
                   'position': ['33', '39'],
@@ -145,11 +156,12 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_slashed_testsent_decompose(self):
-        matches = pyre.identify_residues_ravikumar(self.slashed_res_sent)
+        matches = pyre.identify_residues(self.slashed_res_sent)
 
         test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
         truth = [{'aminoacid': 'Tyrosine',
                   'end': 103,
+                  'parent_index': 0,
                   'position': '33',
                   'residue': 'Tyr33',
                   'start': 95,
@@ -157,6 +169,7 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Tyr'},
                  {'aminoacid': 'Tyrosine',
                   'end': 103,
+                  'parent_index': 0,
                   'position': '39',
                   'residue': 'Tyr39',
                   'start': 95,
@@ -164,6 +177,7 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Tyr'},
                  {'aminoacid': 'Tryptophan',
                   'end': 116,
+                  'parent_index': 1,
                   'position': '71',
                   'residue': 'Trp71',
                   'start': 108,
@@ -171,6 +185,7 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Trp'},
                  {'aminoacid': 'Tryptophan',
                   'end': 116,
+                  'parent_index': 1,
                   'position': '77',
                   'residue': 'Trp77',
                   'start': 108,
@@ -178,6 +193,7 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Trp'},
                  {'aminoacid': 'Glutamic acid (Glutamate)',
                   'end': 253,
+                  'parent_index': 2,
                   'position': '30',
                   'residue': 'Glu30',
                   'start': 245,
@@ -185,6 +201,7 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Glu'},
                  {'aminoacid': 'Glutamic acid (Glutamate)',
                   'end': 253,
+                  'parent_index': 2,
                   'position': '36',
                   'residue': 'Glu36',
                   'start': 245,
@@ -192,6 +209,7 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Glu'},
                  {'aminoacid': 'Glutamine',
                   'end': 268,
+                  'parent_index': 3,
                   'position': '159',
                   'residue': 'Gln159',
                   'start': 258,
@@ -199,6 +217,7 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Gln'},
                  {'aminoacid': 'Glutamine',
                   'end': 268,
+                  'parent_index': 3,
                   'position': '165',
                   'residue': 'Gln165',
                   'start': 258,
@@ -206,6 +225,7 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Gln'},
                  {'aminoacid': 'Alanine',
                   'end': 297,
+                  'parent_index': 4,
                   'position': '88',
                   'residue': 'Ala88',
                   'start': 289,
@@ -213,6 +233,7 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Ala'},
                  {'aminoacid': 'Alanine',
                   'end': 297,
+                  'parent_index': 4,
                   'position': '94',
                   'residue': 'Ala94',
                   'start': 289,
@@ -221,7 +242,10 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_mixed_testsent(self):
-        test_set = [match.__dict__ for match in pyre.identify_residues_ravikumar(self.mixed_res_sent)]
+        # test_set = [match.__dict__ for match in pyre.identify_residues(self.mixed_res_sent)]
+        matches = pyre.identify_residues(self.mixed_res_sent)
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in matches]
+
         truth = [{'aminoacid': 'Arginine',
                   'end': 68,
                   'position': ['96', '102'],
@@ -255,8 +279,68 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_mixed_testsent_decompose(self):
-        matches = pyre.identify_residues_ravikumar(self.mixed_res_sent)
-        test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        matches = pyre.identify_residues(self.mixed_res_sent)
+        # test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "residue", "start", "string", "threeletter",]) for match in pyre.decompose_matches(matches)]
+
+
+        # truth = [{'aminoacid': 'Arginine',
+        #           'end': 68,
+        #           'position': '96',
+        #           'residue': 'Arg96',
+        #           'start': 59,
+        #           'string': 'Arg96/102',
+        #           'threeletter': 'Arg'},
+        #          {'aminoacid': 'Arginine',
+        #           'end': 68,
+        #           'position': '102',
+        #           'residue': 'Arg102',
+        #           'start': 59,
+        #           'string': 'Arg96/102',
+        #           'threeletter': 'Arg'},
+        #          {'aminoacid': 'Serine',
+        #           'end': 108,
+        #           'position': 91,
+        #           'residue': 'Ser91',
+        #           'start': 103,
+        #           'string': 'Ser91',
+        #           'threeletter': 'Ser'},
+        #          {'aminoacid': 'Glycine',
+        #           'end': 163,
+        #           'position': 97,
+        #           'residue': 'Gly97',
+        #           'start': 158,
+        #           'string': 'Gly97',
+        #           'threeletter': 'Gly'},
+        #          {'aminoacid': 'Serine',
+        #           'end': 204,
+        #           'position': '91',
+        #           'residue': 'Ser91',
+        #           'start': 193,
+        #           'string': 'Ser91/Gly97',
+        #           'threeletter': 'Ser'},
+        #          {'aminoacid': 'Glycine',
+        #           'end': 204,
+        #           'position': '97',
+        #           'residue': 'Gly97',
+        #           'start': 193,
+        #           'string': 'Ser91/Gly97',
+        #           'threeletter': 'Gly'},
+        #          {'aminoacid': 'Threonine',
+        #           'end': 222,
+        #           'position': '163',
+        #           'residue': 'Thr163',
+        #           'start': 209,
+        #           'string': 'Thr163/Ser169',
+        #           'threeletter': 'Thr'},
+        #          {'aminoacid': 'Serine',
+        #           'end': 222,
+        #           'position': '169',
+        #           'residue': 'Ser169',
+        #           'start': 209,
+        #           'string': 'Thr163/Ser169',
+        #           'threeletter': 'Ser'}]
+
         truth = [{'aminoacid': 'Arginine',
                   'end': 68,
                   'position': '96',
@@ -286,40 +370,41 @@ class TestClass(unittest.TestCase):
                   'string': 'Gly97',
                   'threeletter': 'Gly'},
                  {'aminoacid': 'Serine',
-                  'end': 204,
+                  'end': 198,
                   'position': '91',
                   'residue': 'Ser91',
                   'start': 193,
-                  'string': 'Ser91/Gly97',
+                  'string': 'Ser91',
                   'threeletter': 'Ser'},
                  {'aminoacid': 'Glycine',
                   'end': 204,
                   'position': '97',
                   'residue': 'Gly97',
-                  'start': 193,
-                  'string': 'Ser91/Gly97',
+                  'start': 199,
+                  'string': 'Gly97',
                   'threeletter': 'Gly'},
                  {'aminoacid': 'Threonine',
-                  'end': 222,
+                  'end': 215,
                   'position': '163',
                   'residue': 'Thr163',
                   'start': 209,
-                  'string': 'Thr163/Ser169',
+                  'string': 'Thr163',
                   'threeletter': 'Thr'},
                  {'aminoacid': 'Serine',
                   'end': 222,
                   'position': '169',
                   'residue': 'Ser169',
-                  'start': 209,
-                  'string': 'Thr163/Ser169',
+                  'start': 216,
+                  'string': 'Ser169',
                   'threeletter': 'Ser'}]
 
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_mixed_parenthesis_testsent_decompose(self):
-        matches = pyre.identify_residues_ravikumar(self.mixed_res_parenthesis_sent)
+        matches = pyre.identify_residues(self.mixed_res_parenthesis_sent)
 
-        test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        # test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "residue", "start", "string", "threeletter",]) for match in pyre.decompose_matches(matches)]
 
         truth = [{'aminoacid': 'Arginine',
                   'end': 72,
@@ -381,9 +466,11 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_mixed_parenthesis_testsent(self):
-        matches = pyre.identify_residues_ravikumar(self.mixed_res_parenthesis_sent)
+        matches = pyre.identify_residues(self.mixed_res_parenthesis_sent)
 
-        test_set = [match.__dict__ for match in matches]
+        # test_set = [match.__dict__ for match in matches]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in matches]
+
         truth = [{'aminoacid': 'Arginine',
                   'end': 72,
                   'position': ['96', '102'],
@@ -417,9 +504,10 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_mixed_hyphen_testsent(self):
-        matches = pyre.identify_residues_ravikumar(self.mixed_res_hyphen_sent)
+        matches = pyre.identify_residues(self.mixed_res_hyphen_sent)
 
-        test_set = [match.__dict__ for match in matches]
+        # test_set = [match.__dict__ for match in matches]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in matches]
 
         truth = [{'aminoacid': 'Arginine',
                   'end': 65,
@@ -454,9 +542,60 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_mixed_hyphen_testsent_decompose(self):
-        matches = pyre.identify_residues_ravikumar(self.mixed_res_hyphen_sent)
+        matches = pyre.identify_residues(self.mixed_res_hyphen_sent)
 
-        test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        # test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "residue", "start", "string", "threeletter",]) for match in pyre.decompose_matches(matches)]
+
+        # truth = [{'aminoacid': 'Arginine',
+        #           'end': 65,
+        #           'position': 96,
+        #           'residue': 'Arg96',
+        #           'start': 59,
+        #           'string': 'Arg-96',
+        #           'threeletter': 'Arg'},
+        #          {'aminoacid': 'Serine',
+        #           'end': 106,
+        #           'position': 91,
+        #           'residue': 'Ser91',
+        #           'start': 100,
+        #           'string': 'Ser-91',
+        #           'threeletter': 'Ser'},
+        #          {'aminoacid': 'Glycine',
+        #           'end': 162,
+        #           'position': 97,
+        #           'residue': 'Gly97',
+        #           'start': 156,
+        #           'string': 'Gly-97',
+        #           'threeletter': 'Gly'},
+        #          {'aminoacid': 'Serine',
+        #           'end': 205,
+        #           'position': '91',
+        #           'residue': 'Ser91',
+        #           'start': 192,
+        #           'string': 'Ser-91/Gly-97',
+        #           'threeletter': 'Ser'},
+        #          {'aminoacid': 'Glycine',
+        #           'end': 205,
+        #           'position': '97',
+        #           'residue': 'Gly97',
+        #           'start': 192,
+        #           'string': 'Ser-91/Gly-97',
+        #           'threeletter': 'Gly'},
+        #          {'aminoacid': 'Threonine',
+        #           'end': 225,
+        #           'position': '163',
+        #           'residue': 'Thr163',
+        #           'start': 210,
+        #           'string': 'Thr-163/Ser-169',
+        #           'threeletter': 'Thr'},
+        #          {'aminoacid': 'Serine',
+        #           'end': 225,
+        #           'position': '169',
+        #           'residue': 'Ser169',
+        #           'start': 210,
+        #           'string': 'Thr-163/Ser-169',
+        #           'threeletter': 'Ser'}]
 
         truth = [{'aminoacid': 'Arginine',
                   'end': 65,
@@ -465,53 +604,55 @@ class TestClass(unittest.TestCase):
                   'start': 59,
                   'string': 'Arg-96',
                   'threeletter': 'Arg'},
-                 {'aminoacid': 'Serine',
+                  {'aminoacid': 'Serine',
                   'end': 106,
                   'position': 91,
                   'residue': 'Ser91',
                   'start': 100,
                   'string': 'Ser-91',
                   'threeletter': 'Ser'},
-                 {'aminoacid': 'Glycine',
+                  {'aminoacid': 'Glycine',
                   'end': 162,
                   'position': 97,
                   'residue': 'Gly97',
                   'start': 156,
                   'string': 'Gly-97',
                   'threeletter': 'Gly'},
-                 {'aminoacid': 'Serine',
-                  'end': 205,
+                  {'aminoacid': 'Serine',
+                  'end': 198,
                   'position': '91',
                   'residue': 'Ser91',
                   'start': 192,
-                  'string': 'Ser-91/Gly-97',
+                  'string': 'Ser-91',
                   'threeletter': 'Ser'},
-                 {'aminoacid': 'Glycine',
+                  {'aminoacid': 'Glycine',
                   'end': 205,
                   'position': '97',
                   'residue': 'Gly97',
-                  'start': 192,
-                  'string': 'Ser-91/Gly-97',
+                  'start': 199,
+                  'string': 'Gly-97',
                   'threeletter': 'Gly'},
-                 {'aminoacid': 'Threonine',
-                  'end': 225,
+                  {'aminoacid': 'Threonine',
+                  'end': 217,
                   'position': '163',
                   'residue': 'Thr163',
                   'start': 210,
-                  'string': 'Thr-163/Ser-169',
+                  'string': 'Thr-163',
                   'threeletter': 'Thr'},
-                 {'aminoacid': 'Serine',
+                  {'aminoacid': 'Serine',
                   'end': 225,
                   'position': '169',
                   'residue': 'Ser169',
-                  'start': 210,
-                  'string': 'Thr-163/Ser-169',
+                  'start': 218,
+                  'string': 'Ser-169',
                   'threeletter': 'Ser'}]
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_grammatical_testsent(self):
-        matches = pyre.identify_residues_ravikumar(self.grammatical_sent)
-        test_set = [match.__dict__ for match in matches]
+        matches = pyre.identify_residues(self.grammatical_sent)
+        # test_set = [match.__dict__ for match in matches]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in matches]
+
         truth = [{'aminoacid': 'Serine',
                   'end': 344,
                   'position': ['91'],
@@ -522,8 +663,10 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_grammatical_testsent_decompose(self):
-        matches = pyre.identify_residues_ravikumar(self.grammatical_sent)
-        test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        matches = pyre.identify_residues(self.grammatical_sent)
+        # test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "residue", "start", "string", "threeletter",]) for match in pyre.decompose_matches(matches)]
+
         truth = [{'aminoacid': 'Serine',
                   'end': 344,
                   'position': 91,
@@ -534,8 +677,10 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_grammatical_testsent_end(self):
-        matches = pyre.identify_residues_ravikumar(self.grammatical_sent_end)
-        test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        matches = pyre.identify_residues(self.grammatical_sent_end)
+        # test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "residue", "start", "string", "threeletter",]) for match in pyre.decompose_matches(matches)]
+
         truth = [{'aminoacid': 'Serine',
                   'end': 344,
                   'position': 91,
@@ -546,8 +691,9 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_grammatical_testsent_start(self):
-        matches = pyre.identify_residues_ravikumar(self.grammatical_sent_start)
-        test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        matches = pyre.identify_residues(self.grammatical_sent_start)
+        # test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "residue", "start", "string", "threeletter",]) for match in pyre.decompose_matches(matches)]
         truth = [{'aminoacid': 'Aspartate',
                   'end': 25,
                   'position': 202,
@@ -558,9 +704,11 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_grammatical_testsent_multiple(self):
-        matches = pyre.identify_residues_ravikumar(self.grammatical_sent_multiple)
+        matches = pyre.identify_residues(self.grammatical_sent_multiple)
 
-        test_set = [match.__dict__ for match in matches]
+        # test_set = [match.__dict__ for match in matches]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in matches]
+
         truth = [{'aminoacid': 'Cysteine',
                   'end': 86,
                   'position': ['275'],
@@ -577,9 +725,9 @@ class TestClass(unittest.TestCase):
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_grammatical_testsent_multiple_decompose(self):
-        matches = pyre.identify_residues_ravikumar(self.grammatical_sent_multiple)
-
-        test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        matches = pyre.identify_residues(self.grammatical_sent_multiple)
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "residue", "start", "string", "threeletter",]) for match in pyre.decompose_matches(matches)]
+        # test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
 
         truth = [{'aminoacid': 'Cysteine',
                   'end': 86,
@@ -610,9 +758,10 @@ class TestClass(unittest.TestCase):
         Need to be careful with this one - doesn't actually make 100% sense until you
         decompose it!
         """
-        matches = pyre.identify_residues_ravikumar(self.long_dashed_pos_dashed_sent_start)
+        matches = pyre.identify_residues(self.long_dashed_pos_dashed_sent_start)
 
-        test_set = [match.__dict__ for match in matches]
+        # test_set = [match.__dict__ for match in matches]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in matches]
 
         truth = [{'aminoacid': ['Glu',
                                 'Tyr',
@@ -654,7 +803,7 @@ class TestClass(unittest.TestCase):
         Need to be careful with this one - doesn't actually make 100% sense until you
         decompose it!
         """
-        matches = pyre.identify_residues_ravikumar(self.long_dashed_pos_dashed_sent_start)
+        matches = pyre.identify_residues(self.long_dashed_pos_dashed_sent_start)
 
         test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
 
@@ -734,9 +883,11 @@ class TestClass(unittest.TestCase):
         Need to be careful with this one - doesn't actually make sense until you
         decompose it!
         """
-        matches = pyre.identify_residues_ravikumar(self.long_dashed_pos_dashed_sent)
+        matches = pyre.identify_residues(self.long_dashed_pos_dashed_sent)
 
         test_set = [match.__dict__ for match in matches]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in matches]
+
         truth = [{'aminoacid': ['Glu',
                                 'Tyr',
                                 'Trp',
@@ -778,86 +929,80 @@ class TestClass(unittest.TestCase):
         Need to be careful with this one - doesn't actually make sense until you
         decompose it!
         """
-        matches = pyre.identify_residues_ravikumar(self.long_dashed_pos_dashed_sent)
+        matches = pyre.identify_residues(self.long_dashed_pos_dashed_sent)
 
         test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in pyre.decompose_matches(matches)]
+
         truth = [{'aminoacid': 'Glutamic acid (Glutamate)',
-                  'end': 107,
+                  'end': 39,
                   'position': '30',
-                  'residue': 'Glu30',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 33,
+                  'string': 'Glu-30',
                   'threeletter': 'Glu'},
                  {'aminoacid': 'Tyrosine',
-                  'end': 107,
+                  'end': 46,
                   'position': '33',
-                  'residue': 'Tyr33',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 40,
+                  'string': 'Tyr-33',
                   'threeletter': 'Tyr'},
                  {'aminoacid': 'Tryptophan',
-                  'end': 107,
+                  'end': 53,
                   'position': '71',
-                  'residue': 'Trp71',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 47,
+                  'string': 'Trp-71',
                   'threeletter': 'Trp'},
                  {'aminoacid': 'Serine',
-                  'end': 107,
+                  'end': 60,
                   'position': '91',
-                  'residue': 'Ser91',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 54,
+                  'string': 'Ser-91',
                   'threeletter': 'Ser'},
                  {'aminoacid': 'Arginine',
-                  'end': 107,
+                  'end': 67,
                   'position': '96',
-                  'residue': 'Arg96',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 61,
+                  'string': 'Arg-96',
                   'threeletter': 'Arg'},
                  {'aminoacid': 'Glutamine',
-                  'end': 107,
+                  'end': 75,
                   'position': '159',
-                  'residue': 'Gln159',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 68,
+                  'string': 'Gln-159',
                   'threeletter': 'Gln'},
                  {'aminoacid': 'Asparagine',
-                  'end': 107,
+                  'end': 83,
                   'position': '111',
-                  'residue': 'Asn111',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 76,
+                  'string': 'Asn-111',
                   'threeletter': 'Asn'},
                  {'aminoacid': 'Threonine',
-                  'end': 107,
+                  'end': 91,
                   'position': '163',
-                  'residue': 'Thr163',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 84,
+                  'string': 'Thr-163',
                   'threeletter': 'Thr'},
                  {'aminoacid': 'Alanine',
-                  'end': 107,
+                  'end': 99,
                   'position': '164',
-                  'residue': 'Ala164',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 92,
+                  'string': 'Ala-164',
                   'threeletter': 'Ala'},
                  {'aminoacid': 'Asparagine',
                   'end': 107,
                   'position': '202',
-                  'residue': 'Asn202',
-                  'start': 32,
-                  'string': ' Glu-30-Tyr-33-Trp-71-Ser-91-Arg-96-Gln-159-Asn-111-Thr-163-Ala-164-Asn-202',
+                  'start': 100,
+                  'string': 'Asn-202',
                   'threeletter': 'Asn'}]
 
         self.assertEqual(truth, test_set)
 
     def test_identify_residues_on_long_dashed_testsent(self):
-        matches = pyre.identify_residues_ravikumar(self.long_dashed_sent)
+        matches = pyre.identify_residues(self.long_dashed_sent)
 
-        test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        test_set = [match.__dict__ for match in matches]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "position", "start", "string", "threeletter",]) for match in matches]
+
         truth = [{'aminoacid': ['Glu',
                                 'Tyr',
                                 'Trp',
@@ -892,80 +1037,439 @@ class TestClass(unittest.TestCase):
                                   'Ala',
                                   'Asn']}]
 
+        self.assertEqual(truth, test_set)
+
     def test_identify_residues_on_long_dashed_testsent_decompose(self):
-        matches = pyre.identify_residues_ravikumar(self.long_dashed_sent)
+        matches = pyre.identify_residues(self.long_dashed_sent)
 
         test_set = [match.__dict__ for match in pyre.decompose_matches(matches)]
+        test_set = [match.__as_dict__(keys=["aminoacid", "end", "parent_index", "position", "start", "string", "threeletter",]) for match in pyre.decompose_matches(matches)]
+
         truth = [{'aminoacid': 'Glutamic acid (Glutamate)',
-                  'end': 94,
+                  'end': 35,
+                  'parent_index': 0,
                   'position': '30',
-                  'residue': 'Glu30',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 30,
+                  'string': 'Glu30',
                   'threeletter': 'Glu'},
                  {'aminoacid': 'Tyrosine',
-                  'end': 94,
+                  'end': 41,
+                  'parent_index': 0,
                   'position': '33',
-                  'residue': 'Tyr33',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 36,
+                  'string': 'Tyr33',
                   'threeletter': 'Tyr'},
                  {'aminoacid': 'Tryptophan',
-                  'end': 94,
+                  'end': 47,
+                  'parent_index': 0,
                   'position': '71',
-                  'residue': 'Trp71',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 42,
+                  'string': 'Trp71',
                   'threeletter': 'Trp'},
                  {'aminoacid': 'Serine',
-                  'end': 94,
+                  'end': 53,
+                  'parent_index': 0,
                   'position': '91',
-                  'residue': 'Ser91',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 48,
+                  'string': 'Ser91',
                   'threeletter': 'Ser'},
                  {'aminoacid': 'Arginine',
-                  'end': 94,
+                  'end': 59,
+                  'parent_index': 0,
                   'position': '96',
-                  'residue': 'Arg96',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 54,
+                  'string': 'Arg96',
                   'threeletter': 'Arg'},
                  {'aminoacid': 'Glutamine',
-                  'end': 94,
+                  'end': 66,
+                  'parent_index': 0,
                   'position': '159',
-                  'residue': 'Gln159',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 60,
+                  'string': 'Gln159',
                   'threeletter': 'Gln'},
                  {'aminoacid': 'Asparagine',
-                  'end': 94,
+                  'end': 73,
+                  'parent_index': 0,
                   'position': '111',
-                  'residue': 'Asn111',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 67,
+                  'string': 'Asn111',
                   'threeletter': 'Asn'},
                  {'aminoacid': 'Threonine',
-                  'end': 94,
+                  'end': 80,
+                  'parent_index': 0,
                   'position': '163',
-                  'residue': 'Thr163',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 74,
+                  'string': 'Thr163',
                   'threeletter': 'Thr'},
                  {'aminoacid': 'Alanine',
-                  'end': 94,
+                  'end': 87,
+                  'parent_index': 0,
                   'position': '164',
-                  'residue': 'Ala164',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 81,
+                  'string': 'Ala164',
                   'threeletter': 'Ala'},
                  {'aminoacid': 'Asparagine',
                   'end': 94,
+                  'parent_index': 0,
                   'position': '202',
-                  'residue': 'Asn202',
-                  'start': 29,
-                  'string': ' Glu30-Tyr33-Trp71-Ser91-Arg96-Gln159-Asn111-Thr163-Ala164-Asn202',
+                  'start': 88,
+                  'string': 'Asn202',
                   'threeletter': 'Asn'}]
+
+        # ASSERT TRUE SOMETHING IDIOT
+        self.assertEqual(truth, test_set)
+
+    ## Mutants
+    mutant_string_single = "Several single mutants (Q15K, Q15R, W37K, and W37R), double mutants (Q15K-W37K, Q15K-W37R, " + \
+                           "Q15R-W37K, and Q15R-W37R), and triple mutants (Q15K-D36A-W37R and Q15K-D36S-W37R) were " + \
+                           "prepared and expressed as glutathione S-transferase (GST) fusion proteins in Escherichia" + \
+                           " coli and purified by GSH-agarose affinity chromatography. Mutant Q15K-W37R and mutant Q15R-W37R" + \
+                           " showed comparable activity for NAD and NADP with an increase in activity nearly 3fold over that" + \
+                           " of the wild type."
+
+    def test_identify_mutants_on_mutant_string_single(self):
+        matches = pyre.identify_mutants(self.mutant_string_single)
+        test_set = [match.__as_dict__(
+            keys=["aminoacidfrom", "aminoacidto", "end", "position", "start", "string", "threeletterfrom",
+                  "threeletterto", ]) for match in matches]
+
+        truth = [{'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Lysine',
+                  'end': 28,
+                  'position': 15,
+                  'start': 24,
+                  'string': 'Q15K',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Lys'},
+                 {'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Arginine',
+                  'end': 34,
+                  'position': 15,
+                  'start': 30,
+                  'string': 'Q15R',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Lysine',
+                  'end': 40,
+                  'position': 37,
+                  'start': 36,
+                  'string': 'W37K',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Lys'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Arginine',
+                  'end': 50,
+                  'position': 37,
+                  'start': 46,
+                  'string': 'W37R',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Lysine',
+                  'end': 73,
+                  'position': 15,
+                  'start': 69,
+                  'string': 'Q15K',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Lys'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Lysine',
+                  'end': 78,
+                  'position': 37,
+                  'start': 74,
+                  'string': 'W37K',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Lys'},
+                 {'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Lysine',
+                  'end': 84,
+                  'position': 15,
+                  'start': 80,
+                  'string': 'Q15K',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Lys'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Arginine',
+                  'end': 89,
+                  'position': 37,
+                  'start': 85,
+                  'string': 'W37R',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Arginine',
+                  'end': 95,
+                  'position': 15,
+                  'start': 91,
+                  'string': 'Q15R',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Lysine',
+                  'end': 100,
+                  'position': 37,
+                  'start': 96,
+                  'string': 'W37K',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Lys'},
+                 {'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Arginine',
+                  'end': 110,
+                  'position': 15,
+                  'start': 106,
+                  'string': 'Q15R',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Arginine',
+                  'end': 115,
+                  'position': 37,
+                  'start': 111,
+                  'string': 'W37R',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Lysine',
+                  'end': 142,
+                  'position': 15,
+                  'start': 138,
+                  'string': 'Q15K',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Lys'},
+                 {'aminoacidfrom': 'Aspartic acid (Aspartate)',
+                  'aminoacidto': 'Alanine',
+                  'end': 147,
+                  'position': 36,
+                  'start': 143,
+                  'string': 'D36A',
+                  'threeletterfrom': 'Asp',
+                  'threeletterto': 'Ala'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Arginine',
+                  'end': 152,
+                  'position': 37,
+                  'start': 148,
+                  'string': 'W37R',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Lysine',
+                  'end': 161,
+                  'position': 15,
+                  'start': 157,
+                  'string': 'Q15K',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Lys'},
+                 {'aminoacidfrom': 'Aspartic acid (Aspartate)',
+                  'aminoacidto': 'Serine',
+                  'end': 166,
+                  'position': 36,
+                  'start': 162,
+                  'string': 'D36S',
+                  'threeletterfrom': 'Asp',
+                  'threeletterto': 'Ser'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Arginine',
+                  'end': 171,
+                  'position': 37,
+                  'start': 167,
+                  'string': 'W37R',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Lysine',
+                  'end': 336,
+                  'position': 15,
+                  'start': 332,
+                  'string': 'Q15K',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Lys'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Arginine',
+                  'end': 341,
+                  'position': 37,
+                  'start': 337,
+                  'string': 'W37R',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Glutamine',
+                  'aminoacidto': 'Arginine',
+                  'end': 357,
+                  'position': 15,
+                  'start': 353,
+                  'string': 'Q15R',
+                  'threeletterfrom': 'Gln',
+                  'threeletterto': 'Arg'},
+                 {'aminoacidfrom': 'Tryptophan',
+                  'aminoacidto': 'Arginine',
+                  'end': 362,
+                  'position': 37,
+                  'start': 358,
+                  'string': 'W37R',
+                  'threeletterfrom': 'Trp',
+                  'threeletterto': 'Arg'}]
+
+        # self.assertEqual(deep_sort(test_set), deep_sort(truth))
+        self.assertEqual(truth, test_set)
+
+
+    mutant_substitution_grammar_string = "this is a sent with a mutation, the mutation is Ala97 substituted for Val "
+
+    mutant_substitution_grammar_string_mixed = "this is a sent with a mutation, the mutation is Ala97 substituted for Valine in this sent"
+
+    mutant_substitution_grammar_string_mixed_end = "this is a sent with a mutation, the mutation is Ala97 substituted for Valine."
+
+    mutant_substitution_grammar_string_mixed_end_nofull = "this is a sent with a mutation, the mutation is Ala97 substituted for Valine"
+
+    def test_identify_mutants_on_mutant_substitution_grammar_string(self):
+        matches = pyre.identify_mutants(self.mutant_substitution_grammar_string)
+        test_set = [match.__as_dict__(
+            keys=["aminoacidfrom", "aminoacidto", "end", "position", "start", "string", "threeletterfrom",
+                  "threeletterto", ]) for match in matches]
+
+        truth =[{'aminoacidfrom': 'Alanine',
+  'aminoacidto': 'Valine',
+  'end': 74,
+  'position': 97,
+  'start': 48,
+  'string': 'Ala97 substituted for Val ',
+  'threeletterfrom': 'Ala',
+  'threeletterto': 'Val'}]
+
+        # self.assertEqual(deep_sort(test_set), deep_sort(truth))
+        self.assertEqual(truth, test_set)
+
+    def test_identify_mutants_on_mutant_substitution_grammar_string_mixed(self):
+        matches = pyre.identify_mutants(self.mutant_substitution_grammar_string_mixed)
+        test_set = [match.__as_dict__(
+            keys=["aminoacidfrom", "aminoacidto", "end", "position", "start", "string", "threeletterfrom",
+                  "threeletterto", ]) for match in matches]
+
+        truth = [{'aminoacidfrom': 'Alanine',
+                  'aminoacidto': 'Valine',
+                  'end': 77,
+                  'position': 97,
+                  'start': 48,
+                  'string': 'Ala97 substituted for Valine ',
+                  'threeletterfrom': 'Ala',
+                  'threeletterto': 'Val'}]
+        # self.assertEqual(deep_sort(test_set), deep_sort(truth))
+        self.assertEqual(truth, test_set)
+
+    def test_identify_mutants_on_mutant_substitution_grammar_string_mixed_end(self):
+        matches = pyre.identify_mutants(self.mutant_substitution_grammar_string_mixed_end)
+        test_set = [match.__as_dict__(
+            keys=["aminoacidfrom", "aminoacidto", "end", "position", "start", "string", "threeletterfrom",
+                  "threeletterto", ]) for match in matches]
+
+        truth = [{'aminoacidfrom': 'Alanine',
+                  'aminoacidto': 'Valine',
+                  'end': 77,
+                  'position': 97,
+                  'start': 48,
+                  'string': 'Ala97 substituted for Valine.',
+                  'threeletterfrom': 'Ala',
+                  'threeletterto': 'Val'}]
+        # self.assertEqual(deep_sort(test_set), deep_sort(truth))
+        self.assertEqual(truth, test_set)
+
+    def test_identify_mutants_on_mutant_substitution_grammar_string_mixed_end_nofull(self):
+        matches = pyre.identify_mutants(self.mutant_substitution_grammar_string_mixed_end_nofull)
+        test_set = [match.__as_dict__(
+            keys=["aminoacidfrom", "aminoacidto", "end", "position", "start", "string", "threeletterfrom",
+                  "threeletterto", ]) for match in matches]
+
+        truth = [{'aminoacidfrom': 'Alanine',
+                  'aminoacidto': 'Valine',
+                  'end': 76,
+                  'position': 97,
+                  'start': 48,
+                  'string': 'Ala97 substituted for Valine',
+                  'threeletterfrom': 'Ala',
+                  'threeletterto': 'Val'}]
+        # self.assertEqual(deep_sort(test_set), deep_sort(truth))
+        self.assertEqual(truth, test_set)
+
+
+    mutant_with_arrow_string = "some text here about residues and mutations Ala46→Ser, for example"
+
+    mutant_with_arrow_string_end = "some text here about residues and mutations Ala46→Ser."
+
+    mutant_with_a_different_arrow_string = "Ala46⇒Ser is a mutant with an arrow"
+
+    def test_identify_mutants_on_mutant_with_arrow_string(self):
+        matches = pyre.identify_mutants(self.mutant_with_arrow_string)
+        test_set = [match.__as_dict__(
+            keys=["aminoacidfrom", "aminoacidto", "end", "position", "start", "string", "threeletterfrom",
+                  "threeletterto", ]) for match in matches]
+
+        truth = [{'aminoacidfrom': 'Alanine',
+                  'aminoacidto': 'Serine',
+                  'end': 54,
+                  'position': 46,
+                  'start': 44,
+                  'string': 'Ala46→Ser,',
+                  'threeletterfrom': 'Ala',
+                  'threeletterto': 'Ser'}]
+        # self.assertEqual(deep_sort(test_set), deep_sort(truth))
+        self.assertEqual(truth, test_set)
+
+    def test_identify_mutants_on_mutant_with_arrow_string_end(self):
+        matches = pyre.identify_mutants(self.mutant_with_arrow_string_end)
+        test_set = [match.__as_dict__(
+            keys=["aminoacidfrom", "aminoacidto", "end", "position", "start", "string", "threeletterfrom",
+                  "threeletterto", ]) for match in matches]
+
+        truth = [{'aminoacidfrom': 'Alanine',
+                  'aminoacidto': 'Serine',
+                  'end': 54,
+                  'position': 46,
+                  'start': 44,
+                  'string': 'Ala46→Ser.',
+                  'threeletterfrom': 'Ala',
+                  'threeletterto': 'Ser'}]
+        # self.assertEqual(deep_sort(test_set), deep_sort(truth))
+        self.assertEqual(truth, test_set)
+
+
+    def test_identify_mutants_on_mutant_with_different_arrow_string(self):
+        matches = pyre.identify_mutants(self.mutant_with_a_different_arrow_string)
+        test_set = [match.__as_dict__(
+            keys=["aminoacidfrom", "aminoacidto", "end", "position", "start", "string", "threeletterfrom",
+                  "threeletterto", ]) for match in matches]
+
+        truth = [{'aminoacidfrom': 'Alanine',
+                  'aminoacidto': 'Serine',
+                  'end': 10,
+                  'position': 46,
+                  'start': 0,
+                  'string': 'Ala46⇒Ser ',
+                  'threeletterfrom': 'Ala',
+                  'threeletterto': 'Ser'}]
+        # self.assertEqual(deep_sort(test_set), deep_sort(truth))
+        self.assertEqual(truth, test_set)
+
+    mutant_dashed_string = "the residue Gly-101 to Met; that is the mutation"
+
+    def test_identify_mutants_on_mutant_dashed_string(self):
+        matches = pyre.identify_mutants(self.mutant_dashed_string)
+        test_set = [match.__as_dict__(
+            keys=["aminoacidfrom", "aminoacidto", "end", "position", "start", "string", "threeletterfrom",
+                  "threeletterto", ]) for match in matches]
+
+        truth = [{'aminoacidfrom': 'Glycine',
+                  'aminoacidto': 'Methionine',
+                  'end': 27,
+                  'position': 101,
+                  'start': 12,
+                  'string': 'Gly-101 to Met;',
+                  'threeletterfrom': 'Gly',
+                  'threeletterto': 'Met'}]
+        # self.assertEqual(deep_sort(test_set), deep_sort(truth))
+        self.assertEqual(truth, test_set)
+
+
 
     ## Old Tests
     def _test_decompose_slashed_residue(self):
@@ -1020,6 +1524,7 @@ class TestClass(unittest.TestCase):
 
         truth = [{'aminoacid': 'Arginine',
                   'end': 9,
+                  'parent_index': 0,
                   'position': '99',
                   'residue': 'Arg99',
                   'start': 0,
@@ -1027,19 +1532,21 @@ class TestClass(unittest.TestCase):
                   'threeletter': 'Arg'},
                  {'aminoacid': 'Arginine',
                   'end': 9,
+                  'parent_index': 0,
                   'position': '101',
                   'residue': 'Arg101',
                   'start': 0,
                   'string': 'Arg99/101',
                   'threeletter': 'Arg'}]
 
-        self.assertEqual(match_list, truth)
+        self.assertEqual(truth, match_list)
 
     def test_decompose_compound_residues_good(self):
         good = "Arg101/103"
         matches = pyre.identify_residues(good)
         decomposed = pyre.decompose_matches(matches)
-        match_list = [match.__dict__ for match in decomposed]
+        # match_list = [match.__dict__ for match in decomposed]
+        match_list = [match.__as_dict__(keys=["aminoacid", "end", "position", "residue", "start", "string", "threeletter",]) for match in decomposed]
 
         truth = [{'aminoacid': 'Arginine',
                   'end': 10,
@@ -1056,32 +1563,45 @@ class TestClass(unittest.TestCase):
                   'string': 'Arg101/103',
                   'threeletter': 'Arg'}]
 
-        self.assertEqual(match_list, truth)
-
+        self.assertEqual(truth, match_list)
 
     def test_decompose_compound_residues_bad(self):
         bad = "Thr163/Ser164"
         matches = pyre.identify_residues(bad)
         decomposed = pyre.decompose_matches(matches)
-        match_list = [match.__dict__ for match in decomposed]
+        # match_list = [match.__dict__ for match in decomposed]
+        match_list = [match.__as_dict__(keys=["aminoacid", "end", "position", "residue", "start", "string", "threeletter",]) for match in decomposed]
 
+        # truth = [{'aminoacid': 'Threonine',
+        #           'end': 13,
+        #           'position': '163',
+        #           'residue': 'Thr163',
+        #           'start': 0,
+        #           'string': 'Thr163/Ser164',
+        #           'threeletter': 'Thr'},
+        #          {'aminoacid': 'Serine',
+        #           'end': 13,
+        #           'position': '164',
+        #           'residue': 'Ser164',
+        #           'start': 0,
+        #           'string': 'Thr163/Ser164',
+        #           'threeletter': 'Ser'}]
         truth = [{'aminoacid': 'Threonine',
-                  'end': 13,
+                  'end': 6,
                   'position': '163',
                   'residue': 'Thr163',
                   'start': 0,
-                  'string': 'Thr163/Ser164',
+                  'string': 'Thr163',
                   'threeletter': 'Thr'},
                  {'aminoacid': 'Serine',
                   'end': 13,
                   'position': '164',
                   'residue': 'Ser164',
-                  'start': 0,
-                  'string': 'Thr163/Ser164',
+                  'start': 7,
+                  'string': 'Ser164',
                   'threeletter': 'Ser'}]
 
-        self.assertEqual(match_list, truth)
-
+        self.assertEqual(truth, match_list)
 
     ## TODO - possibly use more inclusive regex followed by "subdivide_compound_residues" within the matchclass
     def _test_subdivide_compound_residues_ugly(self):
@@ -1165,16 +1685,18 @@ class TestClass(unittest.TestCase):
         self.assertDictEqual(deep_sort(location_dict), deep_sort(self.res_locations_dict))
 
     def test_locate_residues(self):
+        verbose=False
         pmc_id = "PMC5740067"
 
         pyre.process([pmc_id, ], this_dir, filename="test_validate_locations_dict_PMC5740067.json", provider="West-Life",
                                  cifscantype='flex', save=True, overwrite=True,
-                                 return_dict=False, decompose=True, verbose=True)
+                                 return_dict=False, decompose=True, verbose=verbose,
+                                 renumber_positions=True, enforce_longContext=True, compact_output=True)
 
         infile = os.path.join(this_dir, "test_validate_locations_dict_PMC5740067.json")
         with open(infile, "r") as ifile:
             # expected_dict = json.load(ifile)
-            test_dict_as_string = ifile.readlines()[0]
+            test_dict_as_string = ifile.readlines()[0] ## THIS ONLY COMPARES THE FIRST LINE - MUST USE COMPACT OUTPUT
 
         infile = os.path.join(this_dir, "test_locations_dict_PMC5740067.json")
         with open(infile, "r") as ifile:
@@ -1183,6 +1705,7 @@ class TestClass(unittest.TestCase):
 
         self.maxDiff = None
         self.assertEqual(test_dict_as_string, expected_dict_as_string)
+
 
     ## Protein identification pyre.identify_protein_ID
 
@@ -1204,6 +1727,24 @@ class TestClass(unittest.TestCase):
 
         unique_proteins = sorted(pyre.identify_protein_ID(self.prot_sent_invalid, simple=False))
         self.assertEqual(expected, unique_proteins)
+
+    def test_find_uniprot_accession(self):
+        id_cands = ['5OTC', '5OT9', '5ORE', '5OTA', '5OVZ', '5OT8', '5ORG', '0000']
+        expected = [['P35120'], ['P35120'], ['P0A4F8'], ['P35120'], ['P35120'], ['P35120'], ['P0A4F8'], False]
+
+        with open(os.path.join(pyre.PDB_dir, "pdb_uniprot_map.pkl"), "rb") as ifile:
+            pdb_uniprot_dict = pickle.load(ifile)  ## to convert between PDBID and UniProt URI
+
+        uri_list_online = []
+        for i in id_cands:
+            uri_list_online.append(pyre.find_UniProt_accession(i, offline=False, pdb_uniprot_map=False))
+
+        uri_list_offline = []
+        for i in id_cands:
+            uri_list_offline.append(pyre.find_UniProt_accession(i, offline=True, pdb_uniprot_map=pdb_uniprot_dict))
+
+        self.assertEqual(expected, uri_list_online)
+        self.assertEqual(expected, uri_list_offline)
 
     def test_locate_proteins_PMC5740067(self):
         ext_id = "PMC5740067"
@@ -1293,7 +1834,7 @@ class TestClass(unittest.TestCase):
     def test_PMCID_to_PMID_conversion(self):
         pmc_id = "PMC5740067"
         expected = "29269740"
-        pm_id = pyre.convert_PMCID_to_PMID(ext_id=pmc_id)
+        pm_id = pyre.convert_PMCID_to_PMID(pmc_id=pmc_id)
         self.assertTrue(pm_id, expected)
 
     def test_request_fulltextXML_request_success(self):
@@ -1324,6 +1865,42 @@ class TestClass(unittest.TestCase):
 
     def test_PDB_dir_exists(self):
         self.assertTrue(os.path.isdir(pyre.PDB_dir))
+
+    ## Offline
+
+    def test_offline_dir_exists(self):
+        self.assertTrue(os.path.isdir(pyre.offline_store_dir))
+
+    def test_offline_text_dict_equals_online(self):
+
+        ext_id = "PMC5740067"
+
+        text_dict_local =  pyre.get_sections_text_local(ext_id=ext_id)
+        text_dict = pyre.get_sections_text(ext_id=ext_id, remove_tables=True, fulltext=False)
+        self.assertDictEqual(text_dict_local, text_dict)
+
+    def test_offline_locate_residues(self):
+        verbose = False
+        pmc_id = "PMC5740067"
+
+        pyre.process([pmc_id, ], this_dir, filename="test_validate_locations_dict_PMC5740067_offline.json",
+                     provider="West-Life",
+                     cifscantype='flex', save=True, overwrite=True,
+                     return_dict=False, decompose=True, verbose=verbose,
+                     renumber_positions=True, enforce_longContext=True, compact_output=True, offline=True)
+
+        infile = os.path.join(this_dir, "test_validate_locations_dict_PMC5740067_offline.json")
+        with open(infile, "r") as ifile:
+            # expected_dict = json.load(ifile)
+            test_dict_as_string = ifile.readlines()[0]  ## THIS ONLY COMPARES THE FIRST LINE - MUST USE COMPACT OUTPUT
+
+        infile = os.path.join(this_dir, "test_locations_dict_PMC5740067.json")
+        with open(infile, "r") as ifile:
+            # expected_dict = json.load(ifile)
+            expected_dict_as_string = ifile.readlines()[0]
+
+        self.maxDiff = None
+        self.assertEqual(test_dict_as_string, expected_dict_as_string)
 
 
 if __name__ == "__main__":

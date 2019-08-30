@@ -9,6 +9,9 @@ High-Level Functions
 
 .. autofunction:: pyresid.identify_residues
 
+.. autofunction:: pyresid.identify_mutants
+
+
 .. autofunction:: pyresid.locate_residues
 
 .. autofunction:: pyresid.process
@@ -25,8 +28,6 @@ Location Functions
 ==================
 .. autofunction:: pyresid.locate_proteins
 
-.. autofunction:: pyresid.locate_proteins
-
 
 API Iteraction Functions
 ========================
@@ -34,13 +35,11 @@ API Iteraction Functions
 
 .. autofunction:: pyresid.parse_request
 
-.. autofunction:: pyresid.download_pdbfile
-
-.. autofunction:: pyresid.download_pdbfile_RCSB
-
+.. autofunction:: pyresid.download_pdbfile_PDBe
 
 Other Functions
 ===============
+
 .. autofunction:: pyresid.get_sections_text
 
 .. autofunction:: pyresid.reconstruct_fulltext

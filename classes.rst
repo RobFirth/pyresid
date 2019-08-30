@@ -10,4 +10,6 @@ Classes
 
 .. autoclass:: pyresid.ProteinMatchClass
 
+.. autoclass:: pyresid.MutantMatchClass
+
 .. autoclass:: pyresid.MyEncoder
