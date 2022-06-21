@@ -1,6 +1,6 @@
 bs4==0.0.1
 scipy==1.0.0
-numpy==1.14
+numpy==1.22.0
 matplotlib>=2.0
 spacy>=2.0
 lxml==4.1.1
